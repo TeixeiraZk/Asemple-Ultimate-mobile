@@ -53,23 +53,24 @@ ScreenGui.IgnoreGuiInset = true
 ScreenGui.Parent = player:WaitForChild("PlayerGui")
 
 -- ==========================================
--- BOTÃO DE ABRIR/FECHAR (MOBILE TOGGLE)
+-- BOTÃO DE ABRIR/FECHAR (Ajustado para 15, 75)
 -- ==========================================
 local ToggleButton = Instance.new("TextButton")
 ToggleButton.Name = "ToggleButton"
-ToggleButton.Size = UDim2.new(0, 50, 0, 35)
-ToggleButton.Position = UDim2.new(0, 50, 0, 75)
+ToggleButton.Size = UDim2.new(0, 60, 0, 40)
+ToggleButton.Position = UDim2.new(0, 15, 0, 75) -- Posição alterada conforme solicitado
 ToggleButton.BackgroundColor3 = COLORS.Header
 ToggleButton.Text = "MENU"
 ToggleButton.TextColor3 = COLORS.Gold
 ToggleButton.Font = Enum.Font.GothamBold
-ToggleButton.TextSize = 10
+ToggleButton.TextSize = 11
+ToggleButton.ZIndex = 100
 ToggleButton.Parent = ScreenGui
 
 local TBOutline = Instance.new("UIStroke", ToggleButton)
 TBOutline.Color = COLORS.Gold
 TBOutline.Thickness = 1
-Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(0, 4)
+Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(0, 5)
 
 -- ==========================================
 -- CÍRCULO FOV 
@@ -136,6 +137,20 @@ NameLabel.Font = Enum.Font.GothamBold
 NameLabel.TextSize = 11
 NameLabel.BackgroundTransparency = 1
 NameLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Identificação de plataforma
+local isMobile = (UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled)
+local platformString = isMobile and "MOBILE" or "PC"
+
+local PlatformLabel = Instance.new("TextLabel", Header)
+PlatformLabel.Text = "PLATAFORMA: " .. platformString
+PlatformLabel.Position = UDim2.new(1, -145, 0, 15)
+PlatformLabel.Size = UDim2.new(0, 130, 0, 14)
+PlatformLabel.TextColor3 = COLORS.Gold
+PlatformLabel.Font = Enum.Font.GothamBold
+PlatformLabel.TextSize = 9
+PlatformLabel.BackgroundTransparency = 1
+PlatformLabel.TextXAlignment = Enum.TextXAlignment.Right
 
 local DateLabel = Instance.new("TextLabel", Header)
 DateLabel.Text = os.date("%d/%m/%Y")
@@ -381,7 +396,7 @@ createButton(UtilsR, "📂 Load Settings", function()
 end)
 
 -- ==========================================
--- LÓGICA CORE: AIMBOT RAGE & SILENT AIM & SPINBOT
+-- LÓGICA CORE
 -- ==========================================
 RunService.RenderStepped:Connect(function()
     local mousePos = UserInputService:GetMouseLocation()
@@ -446,7 +461,7 @@ RunService.RenderStepped:Connect(function()
 end)
 
 -- ==========================================
--- LOGICA: ESP ULTIMATE
+-- LOGICA: ESP
 -- ==========================================
 local espCache = {}
 
@@ -548,7 +563,7 @@ RunService.RenderStepped:Connect(function()
 end)
 
 -- ==========================================
--- LOGICA: UTILS (Fly, Speed, Jump, Noclip)
+-- LOGICA: UTILS
 -- ==========================================
 local flyBV, flyBG
 local wasNoclip = false
@@ -587,7 +602,6 @@ RunService.Stepped:Connect(function()
     end
 end)
 
--- Fly em dispositivos Touch/Mobile
 RunService.RenderStepped:Connect(function()
     local char = player.Character
     local root = char and char:FindFirstChild("HumanoidRootPart")
@@ -598,8 +612,6 @@ RunService.RenderStepped:Connect(function()
             flyBV = Instance.new("BodyVelocity", root) flyBV.MaxForce = Vector3.new(1e5, 1e5, 1e5)
             flyBG = Instance.new("BodyGyro", root) flyBG.MaxTorque = Vector3.new(1e5, 1e5, 1e5) flyBG.D = 10
         end
-        
-        -- Fly Mobile simples: move o personagem na direção em que a câmera está apontada
         local move = camera.CFrame.LookVector * settings.flySpeed
         flyBV.Velocity = move
         flyBG.CFrame = camera.CFrame
@@ -637,7 +649,7 @@ Players.PlayerRemoving:Connect(updateTeleportList)
 updateTeleportList()
 
 -- ==========================================
--- DRAG SYSTEM (SUPORTE PARA TOUCH)
+-- DRAG SYSTEM (SUPORTE TOUCH/MOUSE)
 -- ==========================================
 local d, ds, sp
 Header.InputBegan:Connect(function(i)
